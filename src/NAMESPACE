@@ -1,0 +1,18 @@
+export(pvclust)
+export(pvpick)
+export(msfit)
+export(msplot)
+export(pvrect)
+export(seplot)
+export(parPvclust)
+
+S3method(plot,     pvclust)
+S3method(lines,    pvclust)
+S3method(text,     pvclust)
+S3method(print,    pvclust)
+S3method(summary,  pvclust)
+
+S3method(plot,     msfit)
+S3method(lines,    msfit)
+S3method(summary,  msfit)
+
