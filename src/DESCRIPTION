@@ -10,7 +10,7 @@ Depends: R (>= 2.10.0)
 Suggests: MASS, parallel
 Description: pvclust is a package for assessing the uncertainty in
         hierarchical cluster analysis. It provides AU (approximately
-        unbiased) p-values as well as BP (boostrap probability) values
+        unbiased) p-values as well as BP (bootstrap probability) values
         computed via multiscale bootstrap resampling.
 License: GPL (>= 2)
 URL: http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/
