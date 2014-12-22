@@ -287,11 +287,15 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
     n <- nrow(data); p <- ncol(data)
 
     # hclust for original data
-    METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
-                 "median", "centroid")
-    method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
+    #METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
+    #             "median", "centroid")
+    #method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
+    
     distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
     data.hclust <- hclust(distance, method=method.hclust)
+    
+    # ward -> ward.D
+    if(method.hclust == "ward") method.hclust <- "ward.D"
     
     # multiscale bootstrap
     size <- floor(n*r)
