@@ -65,7 +65,7 @@ hc2split <- function(x)
   return(split)
 }
 
-pvclust.node <- function(x, r,...)
+pvclust.node <- function(x, r, ...)
 {
   #    require(pvclust)
   mboot.node <- lapply(r, boot.hclust, nboot=x, ...)
@@ -73,7 +73,7 @@ pvclust.node <- function(x, r,...)
 }
 
 boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
-                        method.hclust, nboot, store, weight=F)
+                        method.hclust, nboot, store, weight=FALSE, quiet=FALSE)
 { 
   n     <- nrow(data)
   size  <- round(n*r, digits=0)
@@ -87,7 +87,8 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
   
   # bootstrap start
   rp <- as.character(round(r,digits=2)); if(r == 1) rp <- paste(rp,".0",sep="")
-  cat(paste("Bootstrap (r = ", rp, ")... ", sep=""))
+  if(!quiet)
+      cat(paste("Bootstrap (r = ", rp, ")... ", sep=""))
   w0 <- rep(1,n) # equal weight
   na.flag <- 0
   
@@ -115,7 +116,8 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
     if(store)
       st[[i]] <- x.hclust
   }
-  cat("Done.\n")
+  if(!quiet)
+    cat("Done.\n")
   # bootstrap done
   
   if(na.flag == 1)

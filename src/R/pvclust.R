@@ -1,6 +1,6 @@
 pvclust <- function(data, method.hclust="average",
                     method.dist="correlation", use.cor="pairwise.complete.obs",
-                    nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE)
+                    nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE, quiet=FALSE)
 {
   # data: (n,p) matrix, n-samples, p-variables
   n <- nrow(data); p <- ncol(data)
@@ -37,7 +37,7 @@ pvclust <- function(data, method.hclust="average",
   
   mboot <- lapply(r, boot.hclust, data=data, object.hclust=data.hclust, nboot=nboot,
                   method.dist=method.dist, use.cor=use.cor,
-                  method.hclust=method.hclust, store=store, weight=weight)
+                  method.hclust=method.hclust, store=store, weight=weight, quiet=quiet)
   
   result <- pvclust.merge(data=data, object.hclust=data.hclust, mboot=mboot)
   
@@ -261,7 +261,7 @@ pvpick <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
 parPvclust <- function(cl=NULL, data, method.hclust="average",
                        method.dist="correlation", use.cor="pairwise.complete.obs",
                        nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE,
-                       weight=FALSE,
+                       weight=FALSE, quiet=FALSE,
                        init.rand=TRUE, seed=NULL, iseed=NULL)
 {
   if(!(require(parallel))) stop("Package parallel is required for parPvclust.")
@@ -327,13 +327,15 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
   if((rem <- nboot %% ncl) > 0)
     nbl[1:rem] <- lapply(nbl[1:rem], "+", 1)
   
-  cat("Multiscale bootstrap... ")
+  if(!quiet)
+    cat("Multiscale bootstrap... ")
   
   mlist <- parallel::parLapply(cl, nbl, pvclust.node,
                                r=r, data=data, object.hclust=data.hclust, method.dist=method.dist,
                                use.cor=use.cor, method.hclust=method.hclust,
-                               store=store, weight=weight)
-  cat("Done.\n")
+                               store=store, weight=weight, quiet=quiet)
+  if(!quiet)
+    cat("Done.\n")
   
   mboot <- mlist[[1]]
   

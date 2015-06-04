@@ -10,12 +10,13 @@
 \usage{
 pvclust(data, method.hclust="average",
         method.dist="correlation", use.cor="pairwise.complete.obs",
-        nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE)
+        nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE,
+        quiet=FALSE)
 
 parPvclust(cl=NULL, data, method.hclust="average",
            method.dist="correlation", use.cor="pairwise.complete.obs",
            nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE,
-           init.rand=TRUE, seed=NULL, iseed=NULL)
+           quiet=FALSE,init.rand=TRUE, seed=NULL, iseed=NULL)
 
 }
 \arguments{
@@ -56,6 +57,7 @@ parPvclust(cl=NULL, data, method.hclust="average",
     weight vector instead of index vector. Useful for large \code{r}
     value (\code{r>10}).  Currently, available only for distance
     \code{"correlation"} and \code{"abscor"}.}
+  \item{quiet}{logical. If \code{TRUE} it does not report the progress.}
 %  \item{init.rand}{logical. If \code{init.rand=TRUE}, random number
 %    generators are initialized at child processes. Random seeds can be
 %    set by \code{seed} argument.}
