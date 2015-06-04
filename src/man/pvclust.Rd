@@ -198,8 +198,8 @@ boston.pp
 ### Using a custom distance measure
 
 ## Define a distance function which returns an object of class "dist".
-## The function must have two arguments: "x" (data matrix) and "...".
-cosine <- function(x, ...) {
+## The function must have only one argument "x" (data matrix or data.frame).
+cosine <- function(x) {
     x <- as.matrix(x)
     y <- t(x) \%*\% x
     res <- 1 - y / (sqrt(diag(y)) \%*\% t(sqrt(diag(y))))
