@@ -22,14 +22,16 @@ parPvclust(cl=NULL, data, method.hclust="average",
   \item{data}{numeric data matrix or data frame.}
   \item{method.hclust}{
     the agglomerative method used in hierarchical clustering. This
-    should be (an abbreviation of) one of \code{"average"}, \code{"ward"},
-    \code{"single"}, \code{"complete"}, \code{"mcquitty"},
+    should be (an abbreviation of) one of \code{"average"}, \code{"ward.D"},
+    \code{"ward.D2"}, \code{"single"}, \code{"complete"}, \code{"mcquitty"},
     \code{"median"} or \code{"centroid"}. The default is
     \code{"average"}. See \code{method} argument in
     \code{\link[stats]{hclust}}.
   }
-  \item{method.dist}{the distance measure to be used. This should be (an
-    abbreviation of) one of \code{"correlation"}, \code{"uncentered"},
+  \item{method.dist}{the distance measure to be used. This should be
+    a character string, or a function which returns a \code{dist} object.
+    A character string should be (an abbreviation of)
+    one of \code{"correlation"}, \code{"uncentered"},
     \code{"abscor"} or those which are allowed for \code{method}
     argument in \code{dist} function. The default is
     \code{"correlation"}. See \emph{details} section in this help and
@@ -159,12 +161,11 @@ parPvclust(cl=NULL, data, method.hclust="average",
   \emph{The Fifteenth International Conference on Genome Informatics 2004},
   P034.
 
-  \url{http://www.is.titech.ac.jp/~shimo/prog/pvclust/}
+  \url{http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/}
 }
 \examples{
-## using Boston data in package MASS
-library(MASS)
-data(Boston)
+### example using Boston data in package MASS
+data(Boston, package = "MASS")
 
 ## multiscale bootstrap resampling
 boston.pv <- pvclust(Boston, nboot=100)
@@ -190,12 +191,25 @@ msplot(boston.pv, edges=c(2,4,6,7))
 
 par(ask=ask.bak)
 
-## Print clusters with high p-values
+## print clusters with high p-values
 boston.pp <- pvpick(boston.pv)
 boston.pp
 
+### Using a custom distance measure
+cosine <- function(x, ...) {
+    x <- as.matrix(x)
+    y <- t(x) \%*\% x
+    res <- 1 - y / (sqrt(diag(y)) \%*\% t(sqrt(diag(y))))
+    res <- as.dist(res)
+    attr(res, "method") <- "cosine"
+    return(res)
+}
+
+result <- pvclust(Boston, method.dist=cosine, nboot=100)
+plot(result)
+
 \dontrun{
-## parallel computation
+### parallel computation
 library(parallel)
 cl <- makeCluster(2, type = "PSOCK")
 
