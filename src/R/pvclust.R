@@ -1,47 +1,81 @@
-pvclust <- function(data, method.hclust="average",
-                    method.dist="correlation", use.cor="pairwise.complete.obs",
-                    nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE, quiet=FALSE)
+pvclust <- function(data, method.hclust="average", method.dist="correlation",
+                    use.cor="pairwise.complete.obs", nboot=1000, parallel=FALSE,
+                    r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE, iseed=NULL, quiet=FALSE)
 {
-  # data: (n,p) matrix, n-samples, p-variables
-  n <- nrow(data); p <- ncol(data)
+  p <- parallel
   
-  # hclust for original data
-  #    METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
-  #                 "median", "centroid")
-  #    method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
+  if(is.null(p) || (!is.logical(p) && (!is.integer(p) || p <= 0) && !inherits(p, "cluster")))
+    stop("parallel should be a logical, an integer or cluster object.")
   
-  # Use custom distance function
-  if(is.function(method.dist)) {
-    distance <- method.dist(data)
-  } else {
-    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
+  if(is.logical(p)) {
+    par.flag <- p
+    par.size <- NULL
+    cl <- NULL
+  } else if(is.integer(p)) {
+    par.flag <- TRUE
+    par.size <- p
+    cl <- NULL
+  } else if(inherits(p, "cluster")) {
+    par.flag <- TRUE
+    cl <- p
   }
   
-  data.hclust <- hclust(distance, method=method.hclust)
+  if(par.flag && !require(parallel)) {
+    warning("Package parallel is required for parallel computation. Use non-parallel mode instead.")
+    par.flag <- FALSE
+  }
   
-  # ward -> ward.D
-  if(method.hclust == "ward") method.hclust <- "ward.D"
-  
-  # multiscale bootstrap
-  size <- floor(n*r)
-  rl <- length(size)
-  
-  if(rl == 1) {
-    if(r != 1.0)
-      warning("Relative sample size r is set to 1.0. AU p-values are not calculated\n")
+  if(par.flag) {
     
-    r <- list(1.0)
+    if(is.null(cl)) {
+      if(is.null(par.size))
+        par.size <- parallel::detectCores() - 1
+      
+      if(!quiet)
+        cat("Creating a temporary cluster...")
+      try_result <- try(cl <- parallel::makePSOCKcluster(par.size))
+      
+      if(inherits(try_result, "try-error")) {
+        if(!quiet)
+          cat("failed to create a cluster. Use non-parallel mode instead.")
+        par.flag <- FALSE
+      } else {
+        if(!quiet) {
+          cat("done:\n")
+          print(cl)
+        }
+        on.exit(parallel::stopCluster(cl))
+      }
+      
+      
+    }
+    
+    pvclust.parallel(cl=cl, data=data, method.hclust=method.hclust,
+                     method.dist=method.dist, use.cor=use.cor,
+                     nboot=nboot, r=r, store=store, weight=weight,
+                     iseed=iseed, quiet=quiet, parallel.check=TRUE)
+    
+  } else {
+    pvclust.nonparallel(data=data, method.hclust=method.hclust,
+                        method.dist=method.dist, use.cor=use.cor,
+                        nboot=nboot, r=r, store=store, weight=weight, iseed=iseed, quiet=quiet)
   }
-  else
-    r <- as.list(size/n)
+}
+
+parPvclust <- function(cl=NULL, data, method.hclust="average",
+                       method.dist="correlation", use.cor="pairwise.complete.obs",
+                       nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE,
+                       weight=FALSE, init.rand=NULL, iseed=NULL, quiet=FALSE) {
+  warning("\"parPvclust\" has been integrated into pvclust (with \"parallel\" option).\nIt is available for back compatibility but will be unavailable in the future.")
   
-  mboot <- lapply(r, boot.hclust, data=data, object.hclust=data.hclust, nboot=nboot,
-                  method.dist=method.dist, use.cor=use.cor,
-                  method.hclust=method.hclust, store=store, weight=weight, quiet=quiet)
+  if(!require(parallel))
+    stop("Package parallel is required for parPvclust.")
   
-  result <- pvclust.merge(data=data, object.hclust=data.hclust, mboot=mboot)
-  
-  return(result)
+  pvclust.parallel(cl=cl, data=data, method.hclust=method.hclust,
+                   method.dist=method.dist, use.cor=use.cor,
+                   nboot=nboot, r=r, store=store, weight=weight,
+                   init.rand=init.rand, iseed=iseed, quiet=quiet,
+                   parallel.check=TRUE)
 }
 
 plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
@@ -256,19 +290,6 @@ pvpick <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
   a$clusters <- a$clusters[length(a$edges):1]
   
   return(a)
-}
-
-parPvclust <- function(cl=NULL, data, method.hclust="average",
-                       method.dist="correlation", use.cor="pairwise.complete.obs",
-                       nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE,
-                       weight=FALSE, quiet=FALSE,
-                       init.rand=TRUE, seed=NULL, iseed=NULL) {
-  
-  parPvclust.internal(cl=cl, data=data, method.hclust=method.hclust,
-                      method.dist=method.dist, use.cor=use.cor,
-                      nboot=nboot, r=r, store=store, weight=weight, quiet=quiet,
-                      init.rand=init.rand, seed=seed, iseed=iseed,
-                      parallel.check=TRUE)
 }
 
 msfit <- function(bp, r, nboot) {
