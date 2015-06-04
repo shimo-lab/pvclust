@@ -10,13 +10,13 @@
 \usage{
 pvclust(data, method.hclust="average",
         method.dist="correlation", use.cor="pairwise.complete.obs",
-        nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE,
-        quiet=FALSE)
+        nboot=1000, parallel=FALSE, r=seq(.5,1.4,by=.1),
+        store=FALSE, weight=FALSE, iseed=NULL, quiet=FALSE)
 
 parPvclust(cl=NULL, data, method.hclust="average",
            method.dist="correlation", use.cor="pairwise.complete.obs",
            nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE, weight=FALSE,
-           quiet=FALSE,init.rand=TRUE, seed=NULL, iseed=NULL)
+           init.rand=NULL, iseed=NULL, quiet=FALSE)
 
 }
 \arguments{
@@ -46,6 +46,15 @@ parPvclust(cl=NULL, data, method.hclust="average",
   }
   \item{nboot}{the number of bootstrap replications. The default is
     \code{1000}.}
+  \item{parallel}{switch for parallel computation.
+  If \code{FALSE} the computation is done in non-parallel mode.
+  If \code{TRUE} or a positive integer is supplied,
+  parallel computation is done with automatically generated PSOCK cluster.
+  Use \code{TRUE} for default cluster size (\code{parallel::detectCores() - 1}),
+  or specify the size by an integer.
+  If a \code{cluster} object is supplied the cluster is used for parallel computation.
+  Note that \code{NULL} is currently not allowed for using the default cluster.
+  }
   \item{r}{numeric vector which specifies the relative sample sizes of
     bootstrap replications. For original sample size \eqn{n} and
     bootstrap sample size \eqn{n'}, this is defined as \eqn{r=n'/n}.}
@@ -57,7 +66,6 @@ parPvclust(cl=NULL, data, method.hclust="average",
     weight vector instead of index vector. Useful for large \code{r}
     value (\code{r>10}).  Currently, available only for distance
     \code{"correlation"} and \code{"abscor"}.}
-  \item{quiet}{logical. If \code{TRUE} it does not report the progress.}
 %  \item{init.rand}{logical. If \code{init.rand=TRUE}, random number
 %    generators are initialized at child processes. Random seeds can be
 %    set by \code{seed} argument.}
@@ -65,11 +73,12 @@ parPvclust(cl=NULL, data, method.hclust="average",
 %    length as \code{cl}. If \code{NULL} is specified,
 %    \code{1:length(cl)} is used as seed vector. The default is \code{NULL}.}
   \item{init.rand}{logical. If \code{init.rand=TRUE}, random number generators are initialized.
-    Use \code{iseed} argument to achieve reproducible results.}
-  \item{seed}{integer vector of random seeds. It should have the same
-    length as \code{cl}. \strong{This argument is duplicated and will be unavailable in the future. Consider using \code{iseed} instead.} }
-  \item{iseed}{an integer to be passed to \code{clusterSetRNGStream} when \code{init.rand=TRUE}.}
-
+    Use \code{iseed} argument to achieve reproducible results. \strong{This argument is duplicated and will be unavailable in the future.}}
+%  \item{seed}{integer vector of random seeds. It should have the same
+%    length as \code{cl}. \strong{This argument is duplicated and will be unavailable in the future. Consider using \code{iseed} instead.} }
+  \item{iseed}{An integer. If non-\code{NULL} value is supplied random number generators are initialized.
+  It is passed to \code{set.seed} or \code{clusterSetRNGStream}.}
+  \item{quiet}{logical. If \code{TRUE} it does not report the progress.}
 }
 \details{
   Function \code{pvclust} conducts multiscale bootstrap resampling to calculate
@@ -169,8 +178,8 @@ parPvclust(cl=NULL, data, method.hclust="average",
 ### example using Boston data in package MASS
 data(Boston, package = "MASS")
 
-## multiscale bootstrap resampling
-boston.pv <- pvclust(Boston, nboot=100)
+## multiscale bootstrap resampling (non-parallel)
+boston.pv <- pvclust(Boston, nboot=100, parallel=FALSE)
 
 ## CAUTION: nboot=100 may be too small for actual use.
 ##          We suggest nboot=1000 or larger.
@@ -215,13 +224,10 @@ plot(result)
 
 \dontrun{
 ### parallel computation
-library(parallel)
-cl <- makeCluster(2, type = "PSOCK")
-
-## parallel version of pvclust
-boston.pv <- parPvclust(cl, Boston, nboot=1000)
-stopCluster(cl)
+result.par <- pvclust(Boston, nboot=1000, parallel=TRUE)
+plot(result.par)
 }
+
 }
 \author{Ryota Suzuki \email{suzuki@ef-prime.com}}
 \keyword{cluster}
