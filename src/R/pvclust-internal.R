@@ -85,6 +85,11 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
   edges.cnt <- table(factor(pattern)) - table(factor(pattern))
   st <- list()
   
+  # Use custom distance function
+  if(is.function(method.dist)) {
+    dist.pvclust <- method.dist
+  }
+  
   # bootstrap start
   rp <- as.character(round(r,digits=2)); if(r == 1) rp <- paste(rp,".0",sep="")
   cat(paste("Bootstrap (r = ", rp, ")... ", sep=""))
@@ -97,11 +102,7 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
       suppressWarnings(distance <- distw.pvclust(data,w1,method=method.dist,use.cor=use.cor))
     } else {
       smpl <- sample(1:n, size, replace=TRUE)
-      if(is.function(method.dist)) {
-        suppressWarnings(distance  <- method.dist(data[smpl,]))
-      } else {
-        suppressWarnings(distance  <- dist.pvclust(data[smpl,],method=method.dist,use.cor=use.cor))
-      }
+      suppressWarnings(distance  <- dist.pvclust(data[smpl,],method=method.dist,use.cor=use.cor))
     }
     if(all(is.finite(distance))) { # check if distance is valid
       x.hclust  <- hclust(distance,method=method.hclust)

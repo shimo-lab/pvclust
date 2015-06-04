@@ -12,11 +12,10 @@ pvclust <- function(data, method.hclust="average",
   
   # Use custom distance function
   if(is.function(method.dist)) {
-    distance <- method.dist(data)
-  } else {
-    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
+    dist.pvclust <- method.dist
   }
   
+  distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
   data.hclust <- hclust(distance, method=method.hclust)
   
   # ward -> ward.D
@@ -299,11 +298,10 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
   
   # Use custom distance function
   if(is.function(method.dist)) {
-    distance <- method.dist(data)
-  } else {
-    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
+    dist.pvclust <- method.dist
   }
   
+  distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
   data.hclust <- hclust(distance, method=method.hclust)
   
   # ward -> ward.D
