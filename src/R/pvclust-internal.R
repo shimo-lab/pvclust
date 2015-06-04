@@ -274,3 +274,120 @@ distw.pvclust <- function(x,w,method="correlation", use.cor="pairwise.complete.o
   }
   stop("wrong method")
 }
+
+### check whether parallel computation is appropriate
+check.parallel <- function(cl, nboot) {
+  res <- FALSE
+  
+### will be used when defaultCluster(cl) becomes publicly available
+#   # check whether cl is a cluster, or a default cluster is available
+#   if(!inherits(cl, "cluster")) {
+#     try_result <- try(cl <- parallel:::defaultCluster(cl), silent=TRUE)
+#     if(class(try_result) == "try-error") {
+#       attr(res, "msg" <- "cl is not a cluster")
+#       return(res)
+#     }
+#   }
+  
+  ncl <- length(cl)
+  if(ncl < 2) {
+    attr(res, "msg") <- "Cluster size is too small (or NULL)"
+  } else if (ncl > nboot) {
+    attr(res, "msg") <- "nboot is too small for cluster size"
+  } else {
+    res <- TRUE
+  }
+  
+  return(res)
+}
+
+### internal function for parallel pvclust
+parPvclust.internal <- function(cl, data, method.hclust, method.dist, use.cor,
+                                nboot, r, store, weight, quiet,
+                                init.rand, seed, iseed, parallel.check)
+{
+  if(parallel.check) {
+    if(!require(parallel))
+      stop("Package parallel is required for parPvclust.")
+    
+    check.result <- check.parallel(cl=cl, nboot=nboot)
+    if(!check.result) {
+      msg <- paste(attr(check.result, "msg"), ". non-parallel version is executed", sep = "")
+      warning(msg)
+      return(pvclust(data,method.hclust,method.dist,use.cor,nboot,r,store))
+    }
+  }
+  
+  if(init.rand) {
+    if(is.null(iseed) && !is.null(seed)) {
+      warning("\"seed\" option is deprecated. It is available for back compatibility but will be unavailable in the future.\nConsider using \"iseed\" instead.")
+      
+      if(length(seed) != length(cl))
+        stop("seed and cl should have the same length.")
+      
+      # setting random seeds
+      parallel::parLapply(cl, as.list(seed), set.seed)
+    } else {
+      parallel::clusterSetRNGStream(cl = cl, iseed = iseed)
+    }
+  }
+  
+  # data: (n,p) matrix, n-samples, p-variables
+  n <- nrow(data); p <- ncol(data)
+
+  # hclust for original data
+  if(is.function(method.dist)) {
+    # Use custom distance function
+    distance <- method.dist(data)
+  } else {
+    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
+  }
+
+  data.hclust <- hclust(distance, method=method.hclust)
+  
+  # ward -> ward.D
+  if(method.hclust == "ward") method.hclust <- "ward.D"
+  
+  # multiscale bootstrap
+  size <- floor(n*r)
+  rl <- length(size)
+  
+  if(rl == 1) {
+    if(r != 1.0)
+      warning("Relative sample size r is set to 1.0. AU p-values are not calculated\n")
+    
+    r <- list(1.0)
+  }
+  else
+    r <- as.list(size/n)
+  
+  ncl <- length(cl)
+  nbl <- as.list(rep(nboot %/% ncl,times=ncl))
+  
+  if((rem <- nboot %% ncl) > 0)
+    nbl[1:rem] <- lapply(nbl[1:rem], "+", 1)
+  
+  if(!quiet)
+    cat("Multiscale bootstrap... ")
+  
+  mlist <- parallel::parLapply(cl, nbl, pvclust.node,
+                               r=r, data=data, object.hclust=data.hclust, method.dist=method.dist,
+                               use.cor=use.cor, method.hclust=method.hclust,
+                               store=store, weight=weight, quiet=quiet)
+  if(!quiet)
+    cat("Done.\n")
+  
+  mboot <- mlist[[1]]
+  
+  for(i in 2:ncl) {
+    for(j in 1:rl) {
+      mboot[[j]]$edges.cnt <- mboot[[j]]$edges.cnt + mlist[[i]][[j]]$edges.cnt
+      mboot[[j]]$nboot <- mboot[[j]]$nboot + mlist[[i]][[j]]$nboot
+      mboot[[j]]$store <- c(mboot[[j]]$store, mlist[[i]][[j]]$store)
+    }
+  }
+  
+  result <- pvclust.merge( data=data, object.hclust=data.hclust, mboot=mboot)
+  
+  return(result)
+}

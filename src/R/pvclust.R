@@ -262,94 +262,13 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
                        method.dist="correlation", use.cor="pairwise.complete.obs",
                        nboot=1000, r=seq(.5,1.4,by=.1), store=FALSE,
                        weight=FALSE, quiet=FALSE,
-                       init.rand=TRUE, seed=NULL, iseed=NULL)
-{
-  if(!(require(parallel))) stop("Package parallel is required for parPvclust.")
+                       init.rand=TRUE, seed=NULL, iseed=NULL) {
   
-  if((ncl <- length(cl)) < 2 || ncl > nboot) {
-    if(ncl > nboot)
-      warning("Too small value for nboot: non-parallel version is executed.")
-    else
-      warning("Too small (or NULL) cluster: non-parallel version is executed.")
-    
-    return(pvclust(data,method.hclust,method.dist,use.cor,nboot,r,store))
-  }
-  
-  if(init.rand) {
-    if(is.null(iseed) && !is.null(seed)) {
-      warning("\"seed\" option is deprecated. It is available for back compatibility but will be unavailable in the future.\nConsider using \"iseed\" instead.")
-      
-      if(length(seed) != length(cl))
-        stop("seed and cl should have the same length.")
-      
-      # setting random seeds
-      parallel::parLapply(cl, as.list(seed), set.seed)
-    } else {
-      parallel::clusterSetRNGStream(cl = cl, iseed = iseed)
-    }
-  }
-  
-  # data: (n,p) matrix, n-samples, p-variables
-  n <- nrow(data); p <- ncol(data)
-  
-  # hclust for original data
-  #METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
-  #             "median", "centroid")
-  #method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
-  
-  # Use custom distance function
-  if(is.function(method.dist)) {
-    distance <- method.dist(data)
-  } else {
-    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
-  }
-  
-  data.hclust <- hclust(distance, method=method.hclust)
-  
-  # ward -> ward.D
-  if(method.hclust == "ward") method.hclust <- "ward.D"
-  
-  # multiscale bootstrap
-  size <- floor(n*r)
-  rl <- length(size)
-  
-  if(rl == 1) {
-    if(r != 1.0)
-      warning("Relative sample size r is set to 1.0. AU p-values are not calculated\n")
-    
-    r <- list(1.0)
-  }
-  else
-    r <- as.list(size/n)
-  
-  nbl <- as.list(rep(nboot %/% ncl,times=ncl))
-  
-  if((rem <- nboot %% ncl) > 0)
-    nbl[1:rem] <- lapply(nbl[1:rem], "+", 1)
-  
-  if(!quiet)
-    cat("Multiscale bootstrap... ")
-  
-  mlist <- parallel::parLapply(cl, nbl, pvclust.node,
-                               r=r, data=data, object.hclust=data.hclust, method.dist=method.dist,
-                               use.cor=use.cor, method.hclust=method.hclust,
-                               store=store, weight=weight, quiet=quiet)
-  if(!quiet)
-    cat("Done.\n")
-  
-  mboot <- mlist[[1]]
-  
-  for(i in 2:ncl) {
-    for(j in 1:rl) {
-      mboot[[j]]$edges.cnt <- mboot[[j]]$edges.cnt + mlist[[i]][[j]]$edges.cnt
-      mboot[[j]]$nboot <- mboot[[j]]$nboot + mlist[[i]][[j]]$nboot
-      mboot[[j]]$store <- c(mboot[[j]]$store, mlist[[i]][[j]]$store)
-    }
-  }
-  
-  result <- pvclust.merge( data=data, object.hclust=data.hclust, mboot=mboot)
-  
-  return(result)
+  parPvclust.internal(cl=cl, data=data, method.hclust=method.hclust,
+                      method.dist=method.dist, use.cor=use.cor,
+                      nboot=nboot, r=r, store=store, weight=weight, quiet=quiet,
+                      init.rand=init.rand, seed=seed, iseed=iseed,
+                      parallel.check=TRUE)
 }
 
 msfit <- function(bp, r, nboot) {
