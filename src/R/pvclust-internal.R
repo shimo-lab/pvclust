@@ -7,70 +7,70 @@ hc2axes <- function(x)
   
   x.tmp  <- rep(0,2)
   zz     <- match(1:length(x$order),x$order)
-
-    for(i in 1:(n-1)) {
-        ai <- A[i,1]
-
-        if(ai < 0)
-          x.tmp[1] <- zz[-ai]
-        else
-          x.tmp[1] <- x.axis[ai]
-        
-        ai <- A[i,2]
-        
-        if(ai < 0)
-          x.tmp[2] <- zz[-ai]
-        else
-          x.tmp[2] <- x.axis[ai]
-
-        x.axis[i] <- mean(x.tmp)
-      }
+  
+  for(i in 1:(n-1)) {
+    ai <- A[i,1]
+    
+    if(ai < 0)
+      x.tmp[1] <- zz[-ai]
+    else
+      x.tmp[1] <- x.axis[ai]
+    
+    ai <- A[i,2]
+    
+    if(ai < 0)
+      x.tmp[2] <- zz[-ai]
+    else
+      x.tmp[2] <- x.axis[ai]
+    
+    x.axis[i] <- mean(x.tmp)
+  }
   
   return(data.frame(x.axis=x.axis,y.axis=y.axis))
 }
 
 hc2split <- function(x)
-  {
-    A <- x$merge # (n-1,n) matrix
-    n <- nrow(A) + 1
-    B <- list()
-
-    for(i in 1:(n-1)){
-        ai <- A[i,1]
-        
-        if(ai < 0)
-          B[[i]] <- -ai
-        else
-          B[[i]] <- B[[ai]]        
-        
-        ai <- A[i,2]
-        
-        if(ai < 0)
-          B[[i]] <- sort(c(B[[i]],-ai))
-        else
-          B[[i]] <- sort(c(B[[i]],B[[ai]]))
-      }
-
-    CC <- matrix(rep(0,n*(n-1)),nrow=(n-1),ncol=n)
+{
+  A <- x$merge # (n-1,n) matrix
+  n <- nrow(A) + 1
+  B <- list()
+  
+  for(i in 1:(n-1)){
+    ai <- A[i,1]
     
-    for(i in 1:(n-1)){
-        bi <- B[[i]]
-        m <- length(bi)
-        for(j in 1:m)
-          CC[i,bi[j]] <- 1
-      }
-
-    split <- list(pattern=apply(CC,1,paste,collapse=""), member=B)
+    if(ai < 0)
+      B[[i]] <- -ai
+    else
+      B[[i]] <- B[[ai]]        
     
-    return(split)
+    ai <- A[i,2]
+    
+    if(ai < 0)
+      B[[i]] <- sort(c(B[[i]],-ai))
+    else
+      B[[i]] <- sort(c(B[[i]],B[[ai]]))
   }
+  
+  CC <- matrix(rep(0,n*(n-1)),nrow=(n-1),ncol=n)
+  
+  for(i in 1:(n-1)){
+    bi <- B[[i]]
+    m <- length(bi)
+    for(j in 1:m)
+      CC[i,bi[j]] <- 1
+  }
+  
+  split <- list(pattern=apply(CC,1,paste,collapse=""), member=B)
+  
+  return(split)
+}
 
 pvclust.node <- function(x, r,...)
-  {
-#    require(pvclust)
-    mboot.node <- lapply(r, boot.hclust, nboot=x, ...)
-    return(mboot.node)
-  }
+{
+  #    require(pvclust)
+  mboot.node <- lapply(r, boot.hclust, nboot=x, ...)
+  return(mboot.node)
+}
 
 boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
                         method.hclust, nboot, store, weight=F)
@@ -80,7 +80,7 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
   if(size == 0)
     stop("invalid scale parameter(r)")
   r <- size/n
-
+  
   pattern   <- hc2split(object.hclust)$pattern
   edges.cnt <- table(factor(pattern)) - table(factor(pattern))
   st <- list()
@@ -105,9 +105,9 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
       edges.cnt <- edges.cnt + table(factor(pattern.i,  levels=pattern))
     } else {
       x.hclust <- NULL
-	  na.flag <- 1
+      na.flag <- 1
     }
-
+    
     if(store)
       st[[i]] <- x.hclust
   }
@@ -115,8 +115,8 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
   # bootstrap done
   
   if(na.flag == 1)
-	warning(paste("inappropriate distance matrices are omitted in computation: r = ", r), call.=FALSE)
-
+    warning(paste("inappropriate distance matrices are omitted in computation: r = ", r), call.=FALSE)
+  
   boot <- list(edges.cnt=edges.cnt, method.dist=method.dist, use.cor=use.cor,
                method.hclust=method.hclust, nboot=nboot, size=size, r=r, store=st)
   class(boot) <- "boot.hclust"
@@ -138,7 +138,7 @@ pvclust.merge <- function(data, object.hclust, mboot){
   edges.bp <- edges.cnt <- data.frame(matrix(rep(0,ne*rl),nrow=ne,ncol=rl))
   row.names(edges.bp) <- pattern
   names(edges.cnt) <- paste("r", 1:rl, sep="")
-
+  
   for(j in 1:rl) {
     edges.cnt[,j] <- as.vector(mboot[[j]]$edges.cnt) 
     edges.bp[,j]  <- edges.cnt[,j] / nboot[j]
@@ -164,12 +164,12 @@ pvclust.merge <- function(data, object.hclust, mboot){
   
   edges.pv <- data.frame(au=au, bp=bp, se.au=se.au, se.bp=se.bp,
                          v=v, c=cc, pchi=pchi)
-
+  
   row.names(edges.pv) <- row.names(edges.cnt) <- 1:ne
-
+  
   result <- list(hclust=object.hclust, edges=edges.pv, count=edges.cnt,
                  msfit=ms.fitted, nboot=nboot, r=r, store=store)
-
+  
   class(result) <- "pvclust"
   return(result)
 }
@@ -206,18 +206,18 @@ dist.pvclust <- function(x, method="euclidean", use.cor="pairwise.complete.obs")
 
 corw <- function(x,w,
                  use=c("all.obs","complete.obs","pairwise.complete.obs")
-                 ) {
+) {
   if(is.data.frame(x)) x <- as.matrix(x)
   x <- x[w>0,,drop=F]
   w <- w[w>0]
-
+  
   n <- nrow(x) # sample size
   m <- ncol(x) # number of variables
   if(missing(w)) w <- rep(1,n)
   r <- matrix(0,m,m,dimnames=list(colnames(x),colnames(x)))
   diag(r) <- 1
   use <- match.arg(use)
-
+  
   pairu <- F
   if(use=="all.obs") {
     u <- rep(T,n)
