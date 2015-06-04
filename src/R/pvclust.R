@@ -9,6 +9,12 @@ pvclust <- function(data, method.hclust="average",
   #    METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
   #                 "median", "centroid")
   #    method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
+  
+  # Use custom distance function
+  if(is.function(method.dist)) {
+    dist.pvclust <- method.dist
+  }
+  
   distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
   data.hclust <- hclust(distance, method=method.hclust)
   
@@ -257,7 +263,6 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
                        weight=FALSE,
                        init.rand=TRUE, seed=NULL, iseed=NULL)
 {
-  # if(!(require(snow))) stop("Package snow is required for parPvclust.")
   if(!(require(parallel))) stop("Package parallel is required for parPvclust.")
   
   if((ncl <- length(cl)) < 2 || ncl > nboot) {
@@ -290,6 +295,11 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
   #METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
   #             "median", "centroid")
   #method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
+  
+  # Use custom distance function
+  if(is.function(method.dist)) {
+    dist.pvclust <- method.dist
+  }
   
   distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
   data.hclust <- hclust(distance, method=method.hclust)

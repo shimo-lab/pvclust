@@ -85,6 +85,11 @@ boot.hclust <- function(r, data, object.hclust, method.dist, use.cor,
   edges.cnt <- table(factor(pattern)) - table(factor(pattern))
   st <- list()
   
+  # Use custom distance function
+  if(is.function(method.dist)) {
+    dist.pvclust <- method.dist
+  }
+  
   # bootstrap start
   rp <- as.character(round(r,digits=2)); if(r == 1) rp <- paste(rp,".0",sep="")
   cat(paste("Bootstrap (r = ", rp, ")... ", sep=""))
