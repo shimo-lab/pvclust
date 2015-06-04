@@ -196,6 +196,9 @@ boston.pp <- pvpick(boston.pv)
 boston.pp
 
 ### Using a custom distance measure
+
+## Define a distance function which returns an object of class "dist".
+## The function must have two arguments: "x" (data matrix) and "...".
 cosine <- function(x, ...) {
     x <- as.matrix(x)
     y <- t(x) \%*\% x
