@@ -5,7 +5,7 @@ pvclust <- function(data, method.hclust="average", method.dist="correlation",
   p <- parallel
   
   if(is.null(p) || (!is.logical(p) && (!is.integer(p) || p <= 0) && !inherits(p, "cluster")))
-    stop("parallel should be a logical, an integer or cluster object.")
+    stop("parallel should be a logical, an integer or a cluster object.")
   
   if(is.logical(p)) {
     par.flag <- p
