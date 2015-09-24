@@ -20,7 +20,7 @@ pvclust <- function(data, method.hclust="average", method.dist="correlation",
     cl <- p
   }
   
-  if(par.flag && !require(parallel)) {
+  if(par.flag && !requireNamespace("parallel", quietly=TRUE)) {
     warning("Package parallel is required for parallel computation. Use non-parallel mode instead.")
     par.flag <- FALSE
   }
@@ -68,7 +68,7 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
                        weight=FALSE, init.rand=NULL, iseed=NULL, quiet=FALSE) {
   warning("\"parPvclust\" has been integrated into pvclust (with \"parallel\" option).\nIt is available for back compatibility but will be unavailable in the future.")
   
-  if(!require(parallel))
+  if(!requireNamespace("parallel", quietly=TRUE))
     stop("Package parallel is required for parPvclust.")
   
   pvclust.parallel(cl=cl, data=data, method.hclust=method.hclust,
