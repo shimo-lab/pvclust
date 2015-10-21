@@ -24,7 +24,16 @@ pvclust.nonparallel <- function(data, method.hclust, method.dist, use.cor, nboot
   data.hclust <- hclust(distance, method=method.hclust)
   
   # ward -> ward.D
-  if(method.hclust == "ward") method.hclust <- "ward.D"
+  # only if R >= 3.1.0
+  if(method.hclust == "ward") {
+    v <- c(
+      as.integer(R.Version()$major),
+      as.integer(strsplit(R.Version()$minor, split = "\\.")[[1]])
+    )
+    
+    if(v[1] > 3 || (v[1] == 3 && v[2] >= 1))
+      method.hclust <- "ward.D"
+  }
   
   # multiscale bootstrap
   size <- floor(n*r)
@@ -98,7 +107,16 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
   data.hclust <- hclust(distance, method=method.hclust)
   
   # ward -> ward.D
-  if(method.hclust == "ward") method.hclust <- "ward.D"
+  # only if R >= 3.1.0
+  if(method.hclust == "ward") {
+    v <- c(
+      as.integer(R.Version()$major),
+      as.integer(strsplit(R.Version()$minor, split = "\\.")[[1]])
+    )
+    
+    if(v[1] > 3 || (v[1] == 3 && v[2] >= 1))
+      method.hclust <- "ward.D"
+  }
   
   # multiscale bootstrap
   size <- floor(n*r)
