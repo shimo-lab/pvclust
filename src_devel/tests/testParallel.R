@@ -1,14 +1,17 @@
 library(pvclust)
 library(MASS)
 
-pv <- pvclust(Boston, nboot = 1e+4)
+pv.par <- pvclust(Boston, nboot = 1e+4, parallel = TRUE)
+pv <- pvclust(Boston, nboot = 1e+4, parallel = FALSE)
 
 ## parallel version
-library(parallel)
-n <- max(2, detectCores())
-cl <- makeCluster(n, type="PSOCK")
-pv.par <- parPvclust(cl, Boston, nboot=1e+4)
-stopCluster(cl)
+# library(parallel)
+# n <- max(2, detectCores())
+# cl <- makeCluster(n, type="PSOCK")
+# 
+# pv.par <- parPvclust(cl, Boston, nboot=1e+4)
+# 
+# stopCluster(cl)
 
 compare.pvclust <- function(x, y, bp.threshold = 0.01, au.threshold = 0.01) {
 
