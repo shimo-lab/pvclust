@@ -157,6 +157,10 @@ parPvclust(cl=NULL, data, method.hclust="average",
   \code{\link{text.pvclust}}, \code{\link{pvrect}} and
   \code{\link{pvpick}}.}
 \references{
+  Suzuki, R. and Shimodaira, H. (2006)
+  "Pvclust: an R package for assessing the uncertainty in hierarchical clustering",
+  \emph{Bioinformatics}, 22 (12): 1540-1542.
+  
   Shimodaira, H. (2004)
   "Approximately unbiased tests of regions using multistep-multiscale
   bootstrap resampling",
