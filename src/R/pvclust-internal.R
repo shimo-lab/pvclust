@@ -67,6 +67,27 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
     }
   }
   
+  # check package versions
+  pkg.ver <-parallel::clusterCall(cl, packageVersion, pkg = "pvclust")
+  r.ver   <- parallel::clusterCall(cl, getRversion)
+  if(length(unique(pkg.ver)) > 1 || length(unique(r.ver)) > 1) {
+    
+    node.name <- parallel::clusterEvalQ(cl, Sys.info()["nodename"])
+    version.table <- data.frame(
+      node=seq_len(length(node.name)),
+      name=unlist(node.name),
+      R=unlist(lapply(r.ver, as.character)),
+      pvclust=unlist(lapply(pkg.ver, as.character)))
+    
+    if(nrow(version.table) > 10)
+      table.out <- c(capture.output(print(head(version.table, n=10), row.names=FALSE)), "    ...")
+    else
+      table.out <- capture.output(print(version.table, row.names=FALSE))
+    
+    warning("R/pvclust versions are not unique:\n",
+      paste(table.out, collapse="\n"))
+  }
+  
   if(!is.null(init.rand))
     warning("\"init.rand\" option is deprecated. It is available for back compatibility but will be unavailable in the future.\nSpecify a non-NULL value of \"iseed\" to initialize random seed.")
   
