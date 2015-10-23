@@ -1,14 +1,15 @@
 library(pvclust)
 library(MASS)
 
-pv <- pvclust(Boston, nboot = 1e+4)
-
 ## parallel version
 library(snow)
 n <- 4
 cl <- makeMPIcluster(n)
-pv.par <- parPvclust(cl, Boston, nboot=1e+4)
+#pv.par <- parPvclust(cl, Boston, nboot=1e+4)
+pv.par <- pvclust(Boston, nboot=1e+4, parallel=cl)
 stopCluster(cl)
+
+pv <- pvclust(Boston, nboot = 1e+4)
 
 compare.pvclust <- function(x, y, bp.threshold = 0.01, au.threshold = 0.01) {
 
