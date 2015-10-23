@@ -16,3 +16,9 @@ S3method(plot,     msfit)
 S3method(lines,    msfit)
 S3method(summary,  msfit)
 
+importFrom("grDevices", "n2mfrow")
+importFrom("graphics", "curve", "lines", "par", "plot", "rect",
+           "segments", "text")
+importFrom("stats", "as.dist", "cor", "dist", "dnorm", "hclust",
+           "lsfit", "na.omit", "pchisq", "pnorm", "qnorm", "rmultinom")
+importFrom("utils", "capture.output", "head", "packageVersion")
