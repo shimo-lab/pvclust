@@ -84,7 +84,7 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
                          main=NULL, sub=NULL, xlab=NULL, ...)
 {
   if(is.null(main))
-    main="Cluster dendrogram with SI/AU/BP values (%)"
+    main=paste("Cluster SI/AU/BP values (%) by",paste(x$method, collapse=" "))
   
   if(is.null(sub))
     sub=paste("Cluster method: ", x$hclust$method, sep="")

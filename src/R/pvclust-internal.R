@@ -350,7 +350,7 @@ pvclust.merge <- function(data, object.hclust, mboot){
   
   result <- list(hclust=object.hclust, edges=edges.pv, count=edges.cnt,
                  msfit=ms.fitted, nboot=nboot, r=r, store=store)
-  
+  result$method <- "pvclust"
   class(result) <- "pvclust"
   return(result)
 }
