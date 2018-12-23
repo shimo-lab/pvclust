@@ -5,12 +5,12 @@
   for pvclust object.
 }
 \usage{
-seplot(object, type=c("au", "bp"), identify=FALSE, main=NULL,
-xlab=NULL, ylab=NULL, ...)
+seplot(object, type=c("si", "au", "bp"), identify=FALSE,
+                   main=NULL, xlab=NULL, ylab=NULL, ...)
 }
 \arguments{
   \item{object}{object of class \code{pvclust}.}
-  \item{type}{the type of \eqn{p}-value to be plotted, one of \code{"au"}
+  \item{type}{the type of \eqn{p}-value to be plotted, one of \code{"si"}, \code{"au"}
     or \code{"bp"}.}
   \item{identify}{logical. If \code{TRUE}, edge numbers can be identified
     interactively. See \code{\link{identify}} for basic usage.}

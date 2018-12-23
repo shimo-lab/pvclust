@@ -333,22 +333,24 @@ pvclust.merge <- function(data, object.hclust, mboot){
   se   <- lapply(ms.fitted,"[[","se")
   coef <- lapply(ms.fitted,"[[","coef")
   
+  si    <- unlist(lapply(p,"[[","si"))
   au    <- unlist(lapply(p,"[[","au"))
   bp    <- unlist(lapply(p,"[[","bp"))
+  se.si <- unlist(lapply(se,"[[","si"))
   se.au <- unlist(lapply(se,"[[","au"))
   se.bp <- unlist(lapply(se,"[[","bp"))
   v     <- unlist(lapply(coef,"[[","v"))
   cc    <- unlist(lapply(coef,"[[","c"))
   pchi  <- unlist(lapply(ms.fitted,"[[","pchi"))
   
-  edges.pv <- data.frame(au=au, bp=bp, se.au=se.au, se.bp=se.bp,
+  edges.pv <- data.frame(si=si, au=au, bp=bp, se.si=se.si, se.au=se.au, se.bp=se.bp,
                          v=v, c=cc, pchi=pchi)
   
   row.names(edges.pv) <- row.names(edges.cnt) <- 1:ne
   
   result <- list(hclust=object.hclust, edges=edges.pv, count=edges.cnt,
                  msfit=ms.fitted, nboot=nboot, r=r, store=store)
-  
+  result$method <- "pvclust"
   class(result) <- "pvclust"
   return(result)
 }
