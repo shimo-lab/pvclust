@@ -9,18 +9,18 @@
   \code{pvpick} returns a list of such clusters.
 }
 \usage{
-pvpick(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
+pvpick(x, alpha=0.95, pv="si", type="geq", max.only=TRUE)
 
-pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=2, ...)
+pvrect(x, alpha=0.95, pv="si", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
 
-\method{lines}{pvclust}(x, alpha=0.95, pv="au", type="geq", col=2, lwd=2, ...)
+\method{lines}{pvclust}(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
 }
 \arguments{
   \item{x}{object of class \code{pvclust}.}
   \item{alpha}{threshold value for \eqn{p}-values.}
   \item{pv}{character string which specifies the \eqn{p}-value to be
-    used. It should be either of \code{"au"} or \code{"bp"},
-    corresponding to AU \eqn{p}-value or BP value, respectively. See
+    used. It should be one of \code{"si"}, \code{"au"} and \code{"bp"},
+    corresponding to SI, AU \eqn{p}-value and BP value, respectively. See
     \code{plot.pvclust} for details.}
   \item{type}{one of \code{"geq"}, \code{"leq"}, \code{"gt"} or
     \code{"lt"}. If \code{"geq"} is specified, clusters with
@@ -32,8 +32,6 @@ pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=2, ...)
   \item{max.only}{logical. If some of clusters with high/low
     \eqn{p}-values have inclusion relation, only the largest cluster is
     returned (or displayed) when \code{max.only=TRUE}.}
-  \item{border}{numeric value which specifies the color of borders of
-    rectangles.}
   \item{col}{numeric value which specifies the color of lines.}
   \item{lwd}{numeric value which specifies the width of lines.}
   \item{...}{other graphic parameters to be used.}
