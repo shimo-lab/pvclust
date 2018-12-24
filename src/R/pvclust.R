@@ -79,7 +79,8 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
 }
 
 plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
-                         col.pv=c(4,2,3,8), cex.pv=0.8,  offset=c(1.6,0.3,0.3,0.3), font.pv=NULL,
+                         col.pv=c(4,2,3,8), cex.pv=0.8,  add.offset=0, 
+                         offset=c(1.0,0.1,0.1,0.1), font.pv=NULL,
                          col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL,
                          main=NULL, sub=NULL, xlab=NULL, ...)
 {
@@ -96,13 +97,14 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
        font=font, lty=lty, lwd=lwd, ...)
   
   if(print.pv)
-    text(x, col=col.pv, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset)
+    text(x, col=col.pv, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
 }
 
-text.pvclust <- function(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01, offset=c(1.6,0.3,0.3,0.3), cex=NULL, font=NULL,...)
+text.pvclust <- function(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01, add.offset=0, offset=c(1.0,0.1,0.1,0.1), cex=NULL, font=NULL,...)
 {
   axes <- hc2axes(x$hclust)
   usr  <- par()$usr; wid <- usr[4] - usr[3]
+  offset <- offset+c(add.offset*2, add.offset, add.offset, add.offset)
   if(length(x$edges[,1])>=3) si <- as.character(round(x$edges[,"si"]*100))
   else si <- rep("",length=nrow(x$edges))
   au <- as.character(round(x$edges[,"au"]*100))
@@ -139,7 +141,7 @@ summary.pvclust <- function(object, ...){
   summary(object, ...)
 }
 
-pvrect <- function(x, alpha=0.95, pv="si", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
+pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member
@@ -263,7 +265,7 @@ lines.pvclust <- function(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
   }
 }
 
-pvpick <- function(x, alpha=0.95, pv="si", type="geq", max.only=TRUE)
+pvpick <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member

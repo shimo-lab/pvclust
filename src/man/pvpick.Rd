@@ -9,9 +9,9 @@
   \code{pvpick} returns a list of such clusters.
 }
 \usage{
-pvpick(x, alpha=0.95, pv="si", type="geq", max.only=TRUE)
+pvpick(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
 
-pvrect(x, alpha=0.95, pv="si", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
+pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
 
 \method{lines}{pvclust}(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
 }
