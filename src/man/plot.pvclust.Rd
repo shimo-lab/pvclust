@@ -8,8 +8,9 @@
 }
 \usage{
 \method{plot}{pvclust}(x, print.pv=TRUE, print.num=TRUE, float=0.01,
-    col.pv=c(4,2,3,8), cex.pv=0.8,  add.offset=0, offset=c(1.0,0.1,0.1,0.1), font.pv=NULL,
-    col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL, main=NULL, sub=NULL, xlab=NULL, ...)
+    col.pv=c(4,2,3,8), cex.pv=0.8,  add.offset=0, offset=c(1.0,0.1,0.1,0.1),
+    font.pv=NULL, col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL,
+    main=NULL, sub=NULL, xlab=NULL, ...)
 
 \method{text}{pvclust}(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01,
    add.offset=0, offset=c(1.0,0.1,0.1,0.1), cex=NULL, font=NULL,...)
