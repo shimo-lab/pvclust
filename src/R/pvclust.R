@@ -85,7 +85,7 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
                          main=NULL, sub=NULL, xlab=NULL, ...)
 {
   if(is.null(main))
-    main=paste("Cluster SI/AU/BP values (%) by",paste(x$method, collapse=" "))
+    main="Cluster SI/AU/BP values (%)"
   
   if(is.null(sub))
     sub=paste("Cluster method: ", x$hclust$method, sep="")
