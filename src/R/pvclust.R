@@ -428,20 +428,18 @@ summary.msfit <- function(object, digits=3, ...) {
       " on ", object$df, " DF\n\n", sep="")
 }
 
-seplot <- function(object, type=c("au", "bp"), identify=FALSE,
-# seplot <- function(object, type=c("si", "au", "bp"), identify=FALSE,
+seplot <- function(object, type=c("au", "si", "bp"), identify=FALSE,
                    main=NULL, xlab=NULL, ylab=NULL, ...)
 {
-  if(!is.na(pm <- pmatch(type[1], c("au", "bp")))) {
-    wh <- c("au", "bp")[pm]
-  # if(!is.na(pm <- pmatch(type[1], c("si", "au", "bp")))) {
-  #   wh <- c("si", "au", "bp")[pm]
+  cand <- c("si", "au", "bp")
+  
+  if(!is.na(pm <- pmatch(type[1], cand))) {
+    wh <- cand[pm]
     
     if(is.null(main))
       main <- "p-value vs standard error plot"
     if(is.null(xlab))
-      xlab <- c("AU p-value", "BP value")[pm]
-      # xlab <- c("SI p-value", "AU p-value", "BP value")[pm]
+      xlab <- c("SI p-value", "AU p-value", "BP value")[pm]
     if(is.null(ylab))
       ylab <- "Standard Error"
     
@@ -451,6 +449,5 @@ seplot <- function(object, type=c("au", "bp"), identify=FALSE,
       identify(x=object$edges[,wh], y=object$edges[,paste("se", wh, sep=".")],
                labels=row.names(object$edges))
   }
-  else stop("'type' should be \"au\" or \"bp\".")
-  # else stop("'type' should be \"si\", \"au\" or \"bp\".")
+  else stop("'type' should be \"si\", \"au\" or \"bp\".")
 }
