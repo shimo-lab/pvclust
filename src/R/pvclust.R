@@ -403,8 +403,7 @@ summary.msfit <- function(object, digits=3, ...) {
   
   cat("Estimated p-values:\n")
   pv <- data.frame(object$p, object$se)
-  names(pv) <- c("Estimate", "Std. Error"); row.names(pv) <- c("au", "bp")
-  # names(pv) <- c("Estimate", "Std. Error"); row.names(pv) <- c("si", "au", "bp")
+  names(pv) <- c("Estimate", "Std. Error"); row.names(pv) <- names(object$p)
   print(pv, digits=digits); cat("\n")
   
   cat("Estimated coefficients:\n")
