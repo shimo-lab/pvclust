@@ -432,6 +432,7 @@ seplot <- function(object, type=c("au", "si", "bp"), identify=FALSE,
                    main=NULL, xlab=NULL, ylab=NULL, ...)
 {
   cand <- c("si", "au", "bp")
+  cand <- cand[cand %in% names(object$edges)]
   
   if(!is.na(pm <- pmatch(type[1], cand))) {
     wh <- cand[pm]
