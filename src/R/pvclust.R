@@ -101,33 +101,47 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
     text(x, col=col.pv, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
 }
 
-text.pvclust <- function(x, col=c(2,3,8), print.num=TRUE,  float=0.01, cex=NULL, font=NULL, ...)
+text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE,  float=0.01, cex=NULL, font=NULL, ...)
 # text.pvclust <- function(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01, add.offset=0, offset=c(1.0,0.1,0.1,0.1), cex=NULL, font=NULL,...)
 {
+  # back-compatibility for pvclust <= 2.0-0
+  if(length(col) == 3 && is.null(names(col)))
+    names(col) <- c("au", "bp", "edge")
+  
   axes <- hc2axes(x$hclust)
   usr  <- par()$usr; wid <- usr[4] - usr[3]
-  # offset <- offset+c(add.offset*2, add.offset, add.offset, add.offset)
-  # if(length(x$edges[,1])>=3) si <- as.character(round(x$edges[,"si"]*100))
-  # else si <- rep("",length=nrow(x$edges))
-  au <- as.character(round(x$edges[,"au"]*100))
-  bp <- as.character(round(x$edges[,"bp"]*100))
-  rn <- as.character(row.names(x$edges))
-  # si[length(si)] <- "si"
-  au[length(au)] <- "au"
-  bp[length(bp)] <- "bp"
-  rn[length(rn)] <- "edge #"
-  # text(x=axes[,1], y=axes[,2] + float * wid, si,
-  #           col=col[1], pos=2, offset=offset[1], cex=cex, font=font)
-  text(x=axes[,1], y=axes[,2] + float * wid, au,
-       col=col[1], pos=2, offset=.3, cex=cex, font=font)
-            # col=col[2], pos=2, offset=offset[2], cex=cex, font=font)
-  text(x=axes[,1], y=axes[,2] + float * wid, bp,
-       col=col[2], pos=4, offset=.3, cex=cex, font=font)
-            # col=col[3], pos=4, offset=offset[3], cex=cex, font=font)
-  if(print.num)
-    text(x=axes[,1], y=axes[,2], rn,
-         col=col[3], pos=1, offset=.3, cex=cex, font=font)
-              # col=col[4], pos=1, offset=offset[4], cex=cex, font=font)
+  
+  # list with character vecotr of p-values
+  num_str <- lapply(
+    x$edges[seq_len(which(names(x$edges) == "bp"))],
+    function(p) round(p * 100))
+  
+  # change the last elemnt to the name of p-value
+  for(i in names(num_str)) {
+    num_str[[i]][length(num_str[[i]])] <- i
+  }
+  
+  # add edge numbers
+  num_str$edge <- as.character(row.names(x$edges))
+  num_str$edge[length(num_str$edge)] <- "edge #"
+  
+  if(length(col) <= 3) {
+    range <- seq_len(min(3, length(col)))
+    pos <- c(2, 4, 1)
+    y_offset <- float * wid * c(1.2, 1.2, 0)
+  } else {
+    range <- 1:4
+    pos <- c(2, 4, 2, 4)
+    y_offset <- float * wid * c(1.2, 1.2, -2, -2)
+  }
+  
+  for(i in range) {
+    name <- names(col)[i]
+    
+    text(x=axes[,1], y=axes[,2] + y_offset[i], num_str[[name]],
+         col=col[name], pos=pos[i], offset=.3, cex=cex, font=font)
+  }
+  
 }
 
 print.pvclust <- function(x, which=NULL, digits=3, ...)
