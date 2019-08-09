@@ -116,17 +116,17 @@ text.pvclust <- function(x, col=c(2,3,8), print.num=TRUE,  float=0.01, cex=NULL,
   au[length(au)] <- "au"
   bp[length(bp)] <- "bp"
   rn[length(rn)] <- "edge #"
-  # a <- text(x=axes[,1], y=axes[,2] + float * wid, si,
+  # text(x=axes[,1], y=axes[,2] + float * wid, si,
   #           col=col[1], pos=2, offset=offset[1], cex=cex, font=font)
-  a <- text(x=axes[,1], y=axes[,2] + float * wid, au,
-            col=col[1], pos=2, offset=.3, cex=cex, font=font)
+  text(x=axes[,1], y=axes[,2] + float * wid, au,
+       col=col[1], pos=2, offset=.3, cex=cex, font=font)
             # col=col[2], pos=2, offset=offset[2], cex=cex, font=font)
-  a <- text(x=axes[,1], y=axes[,2] + float * wid, bp,
-            col=col[2], pos=4, offset=.3, cex=cex, font=font)
+  text(x=axes[,1], y=axes[,2] + float * wid, bp,
+       col=col[2], pos=4, offset=.3, cex=cex, font=font)
             # col=col[3], pos=4, offset=offset[3], cex=cex, font=font)
   if(print.num)
-    a <- text(x=axes[,1], y=axes[,2], rn,
-              col=col[3], pos=1, offset=.3, cex=cex, font=font)
+    text(x=axes[,1], y=axes[,2], rn,
+         col=col[3], pos=1, offset=.3, cex=cex, font=font)
               # col=col[4], pos=1, offset=offset[4], cex=cex, font=font)
 }
 
