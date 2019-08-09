@@ -157,8 +157,7 @@ summary.pvclust <- function(object, ...){
   summary(object, ...)
 }
 
-pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=2, ...)
-# pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
+pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=NULL, ...)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member
@@ -167,13 +166,10 @@ pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=2, 
   xwd <- usr[2] - usr[1]
   ywd <- usr[4] - usr[3]
   cin <- par()$cin
-  # if(length(col)==1) {
-  #   border <- col
-  # } else {
-  #   if(pv=="si") border <- col[1]
-  #   if(pv=="au") border <- col[2]
-  #   if(pv=="bp") border <- col[3]
-  # }
+  
+  if(is.null(border)) {
+    border <- c(si=4, au=2, bp=3)[pv]
+  }
   
   ht <- c()
   j <- 1
