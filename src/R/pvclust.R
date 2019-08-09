@@ -128,11 +128,11 @@ text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE,  float=0.
   if(length(col) <= 3) {
     range <- seq_len(min(3, length(col)))
     pos <- c(2, 4, 1)
-    y_offset <- float * wid * c(1.2, 1.2, 0)
+    y_offset <- float * wid * c(1, 1, 0)
   } else {
     range <- 1:4
     pos <- c(2, 4, 2, 4)
-    y_offset <- float * wid * c(1.2, 1.2, -2, -2)
+    y_offset <- float * wid * c(1, 1, -2, -2)
   }
   
   for(i in range) {
