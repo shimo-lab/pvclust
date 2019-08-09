@@ -233,7 +233,6 @@ msplot <- function(x, edges=NULL, ...)
 }
 
 lines.pvclust <- function(x, alpha=0.95, pv="au", type="geq", col=2, lwd=2, ...)
-# lines.pvclust <- function(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member
