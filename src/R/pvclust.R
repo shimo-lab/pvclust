@@ -102,7 +102,6 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
 }
 
 text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE,  float=0.01, cex=NULL, font=NULL, ...)
-# text.pvclust <- function(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01, add.offset=0, offset=c(1.0,0.1,0.1,0.1), cex=NULL, font=NULL,...)
 {
   # back-compatibility for pvclust <= 2.0-0
   if(length(col) == 3 && is.null(names(col)))
