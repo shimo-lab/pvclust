@@ -78,11 +78,12 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
                    parallel.check=TRUE)
 }
 
-plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
-                         col.pv=c(2,3,8), cex.pv=0.8, font.pv=NULL,
+plot.pvclust <- function(x, print.pv=c("au", "bp"), print.num=TRUE, float=0.01,
+                         col.pv=c(si=4, au=2, bp=3, edge=8), cex.pv=0.8, font.pv=NULL,
                          col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL,
                          main=NULL, sub=NULL, xlab=NULL, ...)
 {
+  
   if(is.null(main))
     main="Cluster with p-values (%)"
   
@@ -95,11 +96,28 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
   plot(x$hclust, main=main, sub=sub, xlab=xlab, col=col, cex=cex,
        font=font, lty=lty, lwd=lwd, ...)
   
-  if(print.pv)
-    text(x, col=col.pv, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
+  if(!isFALSE(print.pv)) {
+    
+    # Set default P-values to plot
+    if(isTRUE(print.pv)) {
+      print.pv   <- c("au", "bp")
+    }
+    
+    # back-compatibility for pvclust <= 2.0-0
+    if(isTRUE(print.pv) && length(col) == 3 && is.null(names(col))) {
+      names(col) <- c("au", "bp", "edge")
+    }
+    
+    col.text <- col.pv[print.pv]
+    if(print.num && "edge" %in% names(col.pv)) {
+      col.text <- c(col.text, col.pv["edge"])
+    }
+    
+    text(x, col=col.text, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
+  }
 }
 
-text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE,  float=0.01, cex=NULL, font=NULL, ...)
+text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE, float=0.01, cex=NULL, font=NULL, ...)
 {
   # back-compatibility for pvclust <= 2.0-0
   if(length(col) == 3 && is.null(names(col)))
