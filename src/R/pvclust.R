@@ -151,7 +151,7 @@ text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE, float=0.0
   } else {
     range <- 1:4
     pos <- c(2, 4, 2, 4)
-    y_offset <- float * wid * c(1, 1, -2, -2)
+    y_offset <- c(float, float, 0.01, 0.01) * wid * c(1, 1, -2, -2)
   }
   
   for(i in range) {
