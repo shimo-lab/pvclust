@@ -137,8 +137,12 @@ text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE, float=0.0
   }
   
   # add edge numbers
-  num_str$edge <- as.character(row.names(x$edges))
-  num_str$edge[length(num_str$edge)] <- "edge #"
+  if(print.num) {
+    num_str$edge <- as.character(row.names(x$edges))
+    num_str$edge[length(num_str$edge)] <- "edge #"
+  } else {
+    col <- col[names(col) != "edge"]
+  }
   
   if(length(col) <= 3) {
     range <- seq_len(min(3, length(col)))
