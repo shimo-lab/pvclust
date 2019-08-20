@@ -144,10 +144,16 @@ text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE, float=0.0
     col <- col[names(col) != "edge"]
   }
   
-  if(length(col) <= 3) {
+  if(length(col) <= 1) {
+    range <- 1
+    pos <- 1
+    y_offset <- 0
+    
+  } else if(length(col) <= 3) {
     range <- seq_len(min(3, length(col)))
     pos <- c(2, 4, 1)
     y_offset <- float * wid * c(1, 1, 0)
+    
   } else {
     range <- 1:4
     pos <- c(2, 4, 2, 4)
