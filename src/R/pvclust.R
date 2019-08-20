@@ -85,7 +85,7 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
 {
   
   if(is.null(main))
-    main="Cluster with p-values (%)"
+    main="Cluster dendrogram with p-values (%)"
   
   if(is.null(sub))
     sub=paste("Cluster method: ", x$hclust$method, sep="")
