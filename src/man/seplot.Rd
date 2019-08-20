@@ -5,8 +5,8 @@
   for pvclust object.
 }
 \usage{
-seplot(object, type=c("si", "au", "bp"), identify=FALSE,
-                   main=NULL, xlab=NULL, ylab=NULL, ...)
+seplot(object, type=c("au", "si", "bp"), identify=FALSE,
+  main=NULL, xlab=NULL, ylab=NULL, ...)
 }
 \arguments{
   \item{object}{object of class \code{pvclust}.}

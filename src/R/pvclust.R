@@ -78,7 +78,7 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
                    parallel.check=TRUE)
 }
 
-plot.pvclust <- function(x, print.pv=c("au", "bp"), print.num=TRUE, float=0.01,
+plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
                          col.pv=c(si=4, au=2, bp=3, edge=8), cex.pv=0.8, font.pv=NULL,
                          col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL,
                          main=NULL, sub=NULL, xlab=NULL, ...)
@@ -113,7 +113,7 @@ plot.pvclust <- function(x, print.pv=c("au", "bp"), print.num=TRUE, float=0.01,
       col.text <- c(col.text, col.pv["edge"])
     }
     
-    text(x, col=col.text, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
+    text(x, col=col.text, cex=cex.pv, font=font.pv, float=float, print.num=print.num)
   }
 }
 

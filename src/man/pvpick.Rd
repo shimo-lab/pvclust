@@ -11,9 +11,9 @@
 \usage{
 pvpick(x, alpha=0.95, pv="au", type="geq", max.only=TRUE)
 
-pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
+pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=NULL, ...)
 
-\method{lines}{pvclust}(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
+\method{lines}{pvclust}(x, alpha=0.95, pv="au", type="geq", col=2, lwd=2, ...)
 }
 \arguments{
   \item{x}{object of class \code{pvclust}.}
@@ -32,6 +32,8 @@ pvrect(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
   \item{max.only}{logical. If some of clusters with high/low
     \eqn{p}-values have inclusion relation, only the largest cluster is
     returned (or displayed) when \code{max.only=TRUE}.}
+  \item{border}{numeric value which specifies the color of borders of
+    rectangles.}
   \item{col}{numeric value which specifies the color of lines.}
   \item{lwd}{numeric value which specifies the width of lines.}
   \item{...}{other graphic parameters to be used.}
