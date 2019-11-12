@@ -313,14 +313,16 @@ msfit <- function(bp, r, nboot) {
   
   nboot <- rep(nboot, length=length(bp))
   
-  use <- bp > 0 & bp < 1
+  min.use <- 3 # >= 2
+  eps <- 0.001 # > 0
+  use <- bp > eps & bp < 1-eps
   
   p <- se <- c(0,0,0); names(p) <- names(se) <- c("si", "au", "bp")
   coef <- c(0,0); names(coef) <- c("v", "c")
   
   a <- list(p=p, se=se, coef=coef, df=0, rss=0, pchi=0); class(a) <- "msfit"
   
-  if(sum(use) < 2) {
+  if(sum(use) < min.use) {
     if(mean(bp) < .5) a$p[] <- c(0, 0, 0) else a$p[] <- c(1, 1, 1)
     return(a)
   }
