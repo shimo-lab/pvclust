@@ -345,10 +345,10 @@ msfit <- function(bp, r, nboot) {
   V <- solve(crossprod(X, X/vv))
   vz.au <- drop(h.au %*% V %*% h.au); vz.bp <- drop(h.bp %*% V %*% h.bp)
   d1 <- dnorm(z.au)/d0;  d2 <- p.iau*dnorm(coef[2])/d0^2
-  h.si <- c(-d1,d1+d2)
+  h.si <- c(d1,-d1+d2)
   vz.si <- drop(h.si %*% V %*% h.si)
   a$se["au"] <- dnorm(z.au) * sqrt(vz.au); a$se["bp"] <- dnorm(z.bp) * sqrt(vz.bp)
-  a$se["si"] <- dnorm(qnorm(p.si)) * sqrt(vz.si)
+  a$se["si"] <- sqrt(vz.si)
   a$rss <- sum(fit$residual^2/vv)
   
   if((a$df <- sum(use) - 2) > 0) {
