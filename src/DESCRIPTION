@@ -1,6 +1,6 @@
 Package: pvclust
 Version: 2.2-0
-Date: 2019-08-20
+Date: 2019-11-13
 Title: Hierarchical Clustering with P-Values via Multiscale Bootstrap Resampling
 Author: Ryota Suzuki <suzuki@ef-prime.com>, 
             Yoshikazu Terada <terada@sigmath.es.osaka-u.ac.jp>, 
