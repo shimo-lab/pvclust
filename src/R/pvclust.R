@@ -98,14 +98,14 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
   
   if(!isFALSE(print.pv)) {
     
-    # Set default P-values to plot
-    if(isTRUE(print.pv)) {
-      print.pv   <- c("au", "bp")
-    }
-    
     # back-compatibility for pvclust <= 2.0-0
     if(isTRUE(print.pv) && length(col) == 3 && is.null(names(col))) {
       names(col) <- c("au", "bp", "edge")
+    }
+    
+    # Set default p-values to plot
+    if(isTRUE(print.pv)) {
+      print.pv   <- c("au", "bp")
     }
     
     col.text <- col.pv[print.pv]
