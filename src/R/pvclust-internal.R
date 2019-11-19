@@ -21,7 +21,7 @@ pvclust.common.settings <- function(data, method.dist, use.cor, method.hclust, r
   }
   
   # multiscale bootstrap
-  size <- floor(n*r)
+  size <- unique(floor(n*r))
   rl <- length(size)
   
   if(rl == 1) {
