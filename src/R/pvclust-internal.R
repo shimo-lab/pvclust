@@ -1,21 +1,12 @@
 ### internal function for non-parallel pvclust
-pvclust.nonparallel <- function(data, method.hclust, method.dist, use.cor, nboot, r,
-                                store, weight, iseed, quiet)
-{
-  # initialize random seed
-  if(!is.null(iseed))
-    set.seed(seed = iseed)
-  
+
+pvclust.common.settings <- function(data, method.dist, use.cor, method.hclust, r) {
   # data: (n,p) matrix, n-samples, p-variables
   n <- nrow(data); p <- ncol(data)
   
   # hclust for original data
-  #    METHODS <- c("ward", "single", "complete", "average", "mcquitty", 
-  #                 "median", "centroid")
-  #    method.hclust <- METHODS[pmatch(method.hclust, METHODS)]
-  
-  # Use custom distance function
   if(is.function(method.dist)) {
+    # Use custom distance function
     distance <- method.dist(data)
   } else {
     distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
@@ -26,9 +17,9 @@ pvclust.nonparallel <- function(data, method.hclust, method.dist, use.cor, nboot
   # ward -> ward.D
   # only if R >= 3.1.0
   if(method.hclust == "ward" && getRversion() >= '3.1.0') {
-      method.hclust <- "ward.D"
+    method.hclust <- "ward.D"
   }
-
+  
   # multiscale bootstrap
   size <- floor(n*r)
   rl <- length(size)
@@ -42,11 +33,24 @@ pvclust.nonparallel <- function(data, method.hclust, method.dist, use.cor, nboot
   else
     r <- as.list(size/n)
   
-  mboot <- lapply(r, boot.hclust, data=data, object.hclust=data.hclust, nboot=nboot,
-                  method.dist=method.dist, use.cor=use.cor,
-                  method.hclust=method.hclust, store=store, weight=weight, quiet=quiet)
+  return(list(data.hclust=data.hclust, method.hclust=method.hclust, rl=rl, r=r))
+}
+
+pvclust.nonparallel <- function(data, method.hclust, method.dist, use.cor, nboot, r,
+                                store, weight, iseed, quiet)
+{
+  # initialize random seed
+  if(!is.null(iseed))
+    set.seed(seed = iseed)
   
-  result <- pvclust.merge(data=data, object.hclust=data.hclust, mboot=mboot)
+  # set setting parameters
+  pars <- pvclust.common.settings(data=data, method.dist=method.dist, use.cor=use.cor, method.hclust=method.hclust, r=r)
+  
+  mboot <- lapply(pars$r, boot.hclust, data=data, object.hclust=pars$data.hclust, nboot=nboot,
+                  method.dist=method.dist, use.cor=use.cor,
+                  method.hclust=pars$method.hclust, store=store, weight=weight, quiet=quiet)
+  
+  result <- pvclust.merge(data=data, object.hclust=pars$data.hclust, mboot=mboot)
   
   return(result)
 }
@@ -108,40 +112,11 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
   if(!is.null(iseed) && (is.null(init.rand) || init.rand))
     parallel::clusterSetRNGStream(cl = cl, iseed = iseed)
   
-  # data: (n,p) matrix, n-samples, p-variables
-  n <- nrow(data); p <- ncol(data)
-  
-  # hclust for original data
-  if(is.function(method.dist)) {
-    # Use custom distance function
-    distance <- method.dist(data)
-  } else {
-    distance <- dist.pvclust(data, method=method.dist, use.cor=use.cor)
-  }
-  
-  data.hclust <- hclust(distance, method=method.hclust)
-  
-  # ward -> ward.D
-  # only if R >= 3.1.0
-  if(method.hclust == "ward" && getRversion() >= '3.1.0') {
-    method.hclust <- "ward.D"
-  }
-  
-  # multiscale bootstrap
-  size <- floor(n*r)
-  rl <- length(size)
-  
-  if(rl == 1) {
-    if(r != 1.0)
-      warning("Relative sample size r is set to 1.0. AU p-values are not calculated\n")
-    
-    r <- list(1.0)
-  }
-  else
-    r <- as.list(size/n)
+  # set setting parameters
+  pars <- pvclust.common.settings(data=data, method.dist=method.dist, use.cor=use.cor, method.hclust=method.hclust, r=r)
   
   ncl <- length(cl)
-  nbl <- as.list(rep(nboot %/% ncl,times=ncl))
+  nbl <- as.list(rep(nboot %/% ncl, times=ncl))
   
   if((rem <- nboot %% ncl) > 0)
     nbl[1:rem] <- lapply(nbl[1:rem], "+", 1)
@@ -150,8 +125,8 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
     cat("Multiscale bootstrap... ")
   
   mlist <- parallel::parLapply(cl, nbl, pvclust.node,
-                               r=r, data=data, object.hclust=data.hclust, method.dist=method.dist,
-                               use.cor=use.cor, method.hclust=method.hclust,
+                               r=pars$r, data=data, object.hclust=pars$data.hclust, method.dist=method.dist,
+                               use.cor=use.cor, method.hclust=pars$method.hclust,
                                store=store, weight=weight, quiet=quiet)
   if(!quiet)
     cat("Done.\n")
@@ -159,14 +134,14 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
   mboot <- mlist[[1]]
   
   for(i in 2:ncl) {
-    for(j in 1:rl) {
+    for(j in 1:pars$rl) {
       mboot[[j]]$edges.cnt <- mboot[[j]]$edges.cnt + mlist[[i]][[j]]$edges.cnt
       mboot[[j]]$nboot <- mboot[[j]]$nboot + mlist[[i]][[j]]$nboot
       mboot[[j]]$store <- c(mboot[[j]]$store, mlist[[i]][[j]]$store)
     }
   }
   
-  result <- pvclust.merge(data=data, object.hclust=data.hclust, mboot=mboot)
+  result <- pvclust.merge(data=data, object.hclust=pars$data.hclust, mboot=mboot)
   
   return(result)
 }
