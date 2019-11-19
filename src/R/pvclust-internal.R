@@ -166,7 +166,7 @@ pvclust.parallel <- function(cl, data, method.hclust, method.dist, use.cor,
     }
   }
   
-  result <- pvclust.merge( data=data, object.hclust=data.hclust, mboot=mboot)
+  result <- pvclust.merge(data=data, object.hclust=data.hclust, mboot=mboot)
   
   return(result)
 }
@@ -348,8 +348,10 @@ pvclust.merge <- function(data, object.hclust, mboot){
   
   row.names(edges.pv) <- row.names(edges.cnt) <- 1:ne
   
+  version <- packageVersion("pvclust")
+  
   result <- list(hclust=object.hclust, edges=edges.pv, count=edges.cnt,
-                 msfit=ms.fitted, nboot=nboot, r=r, store=store)
+                 msfit=ms.fitted, nboot=nboot, r=r, store=store, version=version)
   class(result) <- "pvclust"
   return(result)
 }
