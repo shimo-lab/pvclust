@@ -1,16 +1,16 @@
 Package: pvclust
-Version: 2.1-1
-Date: 2019-11-13
+Version: 2.2-0
+Date: 2019-11-19
 Title: Hierarchical Clustering with P-Values via Multiscale Bootstrap Resampling
-Author: Ryota Suzuki <suzuki@ef-prime.com>, 
-            Yoshikazu Terada <terada@sigmath.es.osaka-u.ac.jp>, 
-            Hidetoshi Shimodaira <shimo@i.kyoto-u.ac.jp>
+Author: Ryota Suzuki <suzuki@ef-prime.com>,
+        Yoshikazu Terada <terada@sigmath.es.osaka-u.ac.jp>, 
+        Hidetoshi Shimodaira <shimo@i.kyoto-u.ac.jp>
 Maintainer: Ryota Suzuki <suzuki@ef-prime.com>
 Depends: R (>= 2.10.0)
-Suggests: MASS, parallel, scaleboot
+Suggests: MASS, parallel
 Description: An implementation of multiscale bootstrap resampling for
              assessing the uncertainty in hierarchical cluster analysis.
-             It provides AU (approximately unbiased) p-value as well as
-             BP (bootstrap probability) value for each cluster in a dendrogram.
+             It provides SI (selective inference) p-value, AU (approximately unbiased)
+             p-value and BP (bootstrap probability) value for each cluster in a dendrogram.
 License: GPL (>= 2)
 URL: http://stat.sys.i.kyoto-u.ac.jp/prog/pvclust/
