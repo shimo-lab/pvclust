@@ -79,13 +79,13 @@ parPvclust <- function(cl=NULL, data, method.hclust="average",
 }
 
 plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
-                         col.pv=c(4,2,3,8), cex.pv=0.8,  add.offset=0, 
-                         offset=c(1.0,0.1,0.1,0.1), font.pv=NULL,
+                         col.pv=c(si=4, au=2, bp=3, edge=8), cex.pv=0.8, font.pv=NULL,
                          col=NULL, cex=NULL, font=NULL, lty=NULL, lwd=NULL,
                          main=NULL, sub=NULL, xlab=NULL, ...)
 {
+  
   if(is.null(main))
-    main=paste("Cluster SI/AU/BP values (%) by",paste(x$method, collapse=" "))
+    main="Cluster dendrogram with p-values (%)"
   
   if(is.null(sub))
     sub=paste("Cluster method: ", x$hclust$method, sep="")
@@ -96,33 +96,77 @@ plot.pvclust <- function(x, print.pv=TRUE, print.num=TRUE, float=0.01,
   plot(x$hclust, main=main, sub=sub, xlab=xlab, col=col, cex=cex,
        font=font, lty=lty, lwd=lwd, ...)
   
-  if(print.pv)
-    text(x, col=col.pv, cex=cex.pv, font=font.pv, float=float, print.num=print.num, offset=offset, add.offset=add.offset)
+  if(!isFALSE(print.pv)) {
+    
+    # back-compatibility for pvclust <= 2.0-0
+    if(isTRUE(print.pv) && length(col) == 3 && is.null(names(col))) {
+      names(col) <- c("au", "bp", "edge")
+    }
+    
+    # Set default p-values to plot
+    if(isTRUE(print.pv)) {
+      print.pv   <- c("au", "bp")
+    }
+    
+    col.text <- col.pv[print.pv]
+    if(print.num && "edge" %in% names(col.pv)) {
+      col.text <- c(col.text, col.pv["edge"])
+    }
+    
+    text(x, col=col.text, cex=cex.pv, font=font.pv, float=float, print.num=print.num)
+  }
 }
 
-text.pvclust <- function(x, col=c(4,2,3,8), print.num=TRUE,  float=0.01, add.offset=0, offset=c(1.0,0.1,0.1,0.1), cex=NULL, font=NULL,...)
+text.pvclust <- function(x, col=c(au=2, bp=3, edge=8), print.num=TRUE, float=0.01, cex=NULL, font=NULL, ...)
 {
+  # back-compatibility for pvclust <= 2.0-0
+  if(length(col) == 3 && is.null(names(col)))
+    names(col) <- c("au", "bp", "edge")
+  
   axes <- hc2axes(x$hclust)
   usr  <- par()$usr; wid <- usr[4] - usr[3]
-  offset <- offset+c(add.offset*2, add.offset, add.offset, add.offset)
-  if(length(x$edges[,1])>=3) si <- as.character(round(x$edges[,"si"]*100))
-  else si <- rep("",length=nrow(x$edges))
-  au <- as.character(round(x$edges[,"au"]*100))
-  bp <- as.character(round(x$edges[,"bp"]*100))
-  rn <- as.character(row.names(x$edges))
-  si[length(si)] <- "si"
-  au[length(au)] <- "au"
-  bp[length(bp)] <- "bp"
-  rn[length(rn)] <- "edge #"
-  a <- text(x=axes[,1], y=axes[,2] + float * wid, si,
-            col=col[1], pos=2, offset=offset[1], cex=cex, font=font)
-  a <- text(x=axes[,1], y=axes[,2] + float * wid, au,
-            col=col[2], pos=2, offset=offset[2], cex=cex, font=font)
-  a <- text(x=axes[,1], y=axes[,2] + float * wid, bp,
-            col=col[3], pos=4, offset=offset[3], cex=cex, font=font)
-  if(print.num)
-    a <- text(x=axes[,1], y=axes[,2], rn,
-              col=col[4], pos=1, offset=offset[4], cex=cex, font=font)
+  
+  # list with character vecotr of p-values
+  num_str <- lapply(
+    x$edges[seq_len(which(names(x$edges) == "bp"))],
+    function(p) round(p * 100))
+  
+  # change the last elemnt to the name of p-value
+  for(i in names(num_str)) {
+    num_str[[i]][length(num_str[[i]])] <- i
+  }
+  
+  # add edge numbers
+  if(print.num) {
+    num_str$edge <- as.character(row.names(x$edges))
+    num_str$edge[length(num_str$edge)] <- "edge #"
+  } else {
+    col <- col[names(col) != "edge"]
+  }
+  
+  if(length(col) <= 1) {
+    range <- 1
+    pos <- 1
+    y_offset <- 0
+    
+  } else if(length(col) <= 3) {
+    range <- seq_len(min(3, length(col)))
+    pos <- c(2, 4, 1)
+    y_offset <- float * wid * c(1, 1, 0)
+    
+  } else {
+    range <- 1:4
+    pos <- c(2, 4, 2, 4)
+    y_offset <- c(float, float, 0.01, 0.01) * wid * c(1, 1, -2, -2)
+  }
+  
+  for(i in range) {
+    name <- names(col)[i]
+    
+    text(x=axes[,1], y=axes[,2] + y_offset[i], num_str[[name]],
+         col=col[name], pos=pos[i], offset=.3, cex=cex, font=font)
+  }
+  
 }
 
 print.pvclust <- function(x, which=NULL, digits=3, ...)
@@ -141,7 +185,7 @@ summary.pvclust <- function(object, ...){
   summary(object, ...)
 }
 
-pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,3,8), ...)
+pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, border=NULL, ...)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member
@@ -150,12 +194,9 @@ pvrect <- function(x, alpha=0.95, pv="au", type="geq", max.only=TRUE, col=c(4,2,
   xwd <- usr[2] - usr[1]
   ywd <- usr[4] - usr[3]
   cin <- par()$cin
-  if(length(col)==1) {
-    border <- col
-  } else {
-    if(pv=="si") border <- col[1]
-    if(pv=="au") border <- col[2]
-    if(pv=="bp") border <- col[3]
+  
+  if(is.null(border)) {
+    border <- c(si=4, au=2, bp=3)[pv]
   }
   
   ht <- c()
@@ -219,7 +260,7 @@ msplot <- function(x, edges=NULL, ...)
   }
 }
 
-lines.pvclust <- function(x, alpha=0.95, pv="si", type="geq", col=2, lwd=2, ...)
+lines.pvclust <- function(x, alpha=0.95, pv="au", type="geq", col=2, lwd=2, ...)
 {
   len <- nrow(x$edges)
   member <- hc2split(x$hclust)$member
@@ -402,7 +443,7 @@ summary.msfit <- function(object, digits=3, ...) {
   
   cat("Estimated p-values:\n")
   pv <- data.frame(object$p, object$se)
-  names(pv) <- c("Estimate", "Std. Error"); row.names(pv) <- c("si", "au", "bp")
+  names(pv) <- c("Estimate", "Std. Error"); row.names(pv) <- names(object$p)
   print(pv, digits=digits); cat("\n")
   
   cat("Estimated coefficients:\n")
@@ -414,11 +455,14 @@ summary.msfit <- function(object, digits=3, ...) {
       " on ", object$df, " DF\n\n", sep="")
 }
 
-seplot <- function(object, type=c("si", "au", "bp"), identify=FALSE,
+seplot <- function(object, type=c("au", "si", "bp"), identify=FALSE,
                    main=NULL, xlab=NULL, ylab=NULL, ...)
 {
-  if(!is.na(pm <- pmatch(type[1], c("si", "au", "bp")))) {
-    wh <- c("si", "au", "bp")[pm]
+  cand <- c("si", "au", "bp")
+  cand <- cand[cand %in% names(object$edges)]
+  
+  if(!is.na(pm <- pmatch(type[1], cand))) {
+    wh <- cand[pm]
     
     if(is.null(main))
       main <- "p-value vs standard error plot"
