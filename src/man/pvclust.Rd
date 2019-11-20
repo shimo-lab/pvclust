@@ -151,6 +151,8 @@ parPvclust(cl=NULL, data, method.hclust="average",
     replications.}
   \item{store}{list contains bootstrap replications if \code{store=TRUE}
   was given for function \code{pvclust} or \code{parPvclust}.}
+  \item{version}{\code{\link[base]{package_version}} of pvclust used
+  to generate this object.}
 }
 \seealso{\code{\link{lines.pvclust}}, \code{\link{print.pvclust}},
   \code{\link{msfit}}, \code{\link{plot.pvclust}},
