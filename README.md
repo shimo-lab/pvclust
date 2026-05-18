@@ -42,6 +42,16 @@ An example of DNA microarray data analysis is also available by `example(lung)`.
 
 ![](doc/fig/lung.png)
 
+## Advanced Usage: Selective Inference with scaleboot
+
+Newer versions of **pvclust** (>= 2.2-0) can compute **SI (Selective Inference)** p-values alongside the conventional AU and BP values. We generally recommend using SI values instead of AU and BP to adjust for selection bias (post-selection inference), as AU values can sometimes suffer from selection bias and lead to false positives.
+
+While `pvclust` can compute basic SI values natively, you can recompute them with significantly higher accuracy and less bias by integrating it with the [scaleboot](https://github.com/shimo-lab/scaleboot) package (>= 1.0-1). 
+
+For a comprehensive guide, theoretical background, and step-by-step R code examples using multi-core CPUs, please refer to the dedicated documentation page:
+
+👉 [Computing selective inference p-values of clusters using pvclust and scaleboot](https://stat.sys.i.kyoto-u.ac.jp/prog/scaleboot/pvclust.html)
+
 ## Instruction
 This section gives a quick instruction about the usage of package pvclust. First load the package as follows:
 ```r
@@ -191,9 +201,10 @@ Finally display the result with `nboot = 10000`. Although an overall results did
 ![](doc/fig/inst07.png)
 
 ## Links
-- [R](https://www.r-project.org/)
-- [CRAN](https://cran.r-project.org/)
-- [Shimodaira Laboratory](http://stat.sys.i.kyoto-u.ac.jp/)
+- [pvclust on GitHub](https://github.com/shimo-lab/pvclust)
+- [scaleboot on GitHub](https://github.com/shimo-lab/scaleboot)
+- [scaleboot on CRAN (Archived)](https://cran.r-project.org/web/packages/scaleboot/index.html)
+- [Shimodaira Laboratory](https://stat.sys.i.kyoto-u.ac.jp/)
 
 ---
-For any questions or comments, please email to suzuki (at) ef-prime.com.
+For any questions or comments, please email to suzuki (at) ef-prime.com or shimo (at) i.kyoto-u.ac.jp.
